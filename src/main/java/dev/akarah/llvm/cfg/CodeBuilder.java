@@ -9,12 +9,7 @@ public interface CodeBuilder {
     Value mul(Type type, Value lhs, Value rhs);
     Value div(Type type, Value lhs, Value rhs);
 
-    default Value.IntegerConstant constant(long amount) {
-        return new Value.IntegerConstant(String.valueOf(amount));
-    }
-    default Value.FloatingPointConstant constant(double amount) {
-        return new Value.FloatingPointConstant(String.valueOf(amount));
-    }
+
 
     void ret(Type type, Value value);
 }
