@@ -46,9 +46,16 @@ public class BasicBlock implements CodeBuilder, IRStringConvertable {
     }
 
     @Override
-    public Value div(Type type, Value lhs, Value rhs) {
+    public Value sdiv(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.Div(output, type, lhs, rhs));
+        instructions.add(new Instruction.SDiv(output, type, lhs, rhs));
+        return output;
+    }
+
+    @Override
+    public Value udiv(Type type, Value lhs, Value rhs) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new Instruction.UDiv(output, type, lhs, rhs));
         return output;
     }
 
@@ -59,7 +66,7 @@ public class BasicBlock implements CodeBuilder, IRStringConvertable {
 
     @Override
     public String ir() {
-        return "  " + this.name.ir() + ":\n"
+        return "  " + this.name.name() + ":\n"
                 + this.instructions.stream().map(it -> "    " + it.ir()).collect(Collectors.joining("\n"));
     }
 }

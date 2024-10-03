@@ -32,10 +32,16 @@ public interface Instruction extends IRStringConvertable {
         }
     }
 
-    record Div(Value.LocalVariable output, Type type, Value lhs, Value rhs) implements Instruction {
+    record SDiv(Value.LocalVariable output, Type type, Value lhs, Value rhs) implements Instruction {
         @Override
         public String ir() {
-            return IRFormatter.format("{} = div {} {}, {}", output, type, lhs, rhs);
+            return IRFormatter.format("{} = sdiv {} {}, {}", output, type, lhs, rhs);
+        }
+    }
+    record UDiv(Value.LocalVariable output, Type type, Value lhs, Value rhs) implements Instruction {
+        @Override
+        public String ir() {
+            return IRFormatter.format("{} = udiv {} {}, {}", output, type, lhs, rhs);
         }
     }
 }
