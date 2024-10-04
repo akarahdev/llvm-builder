@@ -1,41 +1,39 @@
+import dev.akarah.llvm.Module;
 import dev.akarah.llvm.cfg.BasicBlock;
 import dev.akarah.llvm.cfg.Function;
-import dev.akarah.llvm.inst.Constant;
-import dev.akarah.llvm.inst.Type;
-import dev.akarah.llvm.inst.Types;
-import dev.akarah.llvm.inst.Value;
+import dev.akarah.llvm.cfg.GlobalVariable;
+import dev.akarah.llvm.inst.*;
+import dev.akarah.llvm.utils.LibcLibrary;
+
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+        var module = Module.of("test-module");
+        var gv = Value.GlobalVariable.random();
+        module.newGlobal(gv, globalVariable -> {
+            globalVariable
+                .withType(Types.array(14, Types.integer(8)))
+                .withValue(new Value.CStringConstant("Hello, world!\\\\00"));
+        });
+        module.withLibrary(LibcLibrary.IO);
+        module.newFunction(new Value.GlobalVariable("main"), function -> {
+                var bb = BasicBlock.of(Value.LocalVariable.random());
+                bb.add(
+                        Types.integer(32),
+                        new Value.IntegerConstant("10"),
+                        new Value.IntegerConstant("20"));
+                bb.call(Types.integer(32), new Value.GlobalVariable("puts"), List.of(
+                   new Instruction.Call.Parameter(
+                       Types.pointerTo(Types.array(13, Types.integer(8))),
+                       gv
+                   )
+                ));
+                bb.ret();
 
-
-        var p0 = Value.LocalVariable.random();
-
-        var bb = BasicBlock.of(Value.LocalVariable.random());
-        var out = bb.add(
-            Types.integer(32),
-            bb.sub(
-                Types.integer(32),
-                Constant.constant(10),
-                Constant.constant(15)
-            ),
-            bb.mul(
-                Types.integer(32),
-                p0,
-                bb.sdiv(
-                    Types.integer(32),
-                    Constant.constant(4),
-                    Constant.constant(6)
-                )
-            )
-        );
-        bb.ret(Types.integer(32), out);
-
-        var f = Function.of(new Value.GlobalVariable("main"))
-            .returns(Types.integer(32))
-            .parameter(Types.integer(32), p0)
-            .basicBlock(bb);
-
-        System.out.println(f.ir());
+                function.returns(Types.VOID)
+                    .basicBlock(bb);
+            });
+        module.compile();
     }
 }

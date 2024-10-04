@@ -1,5 +1,6 @@
 package dev.akarah.llvm.cfg;
 
+import dev.akarah.llvm.inst.Types;
 import dev.akarah.llvm.ir.IRStringConvertable;
 import dev.akarah.llvm.inst.Instruction;
 import dev.akarah.llvm.inst.Type;
@@ -60,8 +61,25 @@ public class BasicBlock implements CodeBuilder, IRStringConvertable {
     }
 
     @Override
+    public Value call(Type returnType, Value.GlobalVariable name, List<Instruction.Call.Parameter> parameters) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new Instruction.Call(
+            output,
+            returnType,
+            name,
+            parameters
+        ));
+        return output;
+    }
+
+    @Override
     public void ret(Type type, Value value) {
         instructions.add(new Instruction.Ret(type, value));
+    }
+
+    @Override
+    public void ret() {
+        instructions.add(new Instruction.Ret(Types.VOID, null));
     }
 
     @Override

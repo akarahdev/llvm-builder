@@ -60,7 +60,7 @@ public interface Type extends IRStringConvertable {
         }
     }
 
-    record Ptr() implements Type {
+    record Ptr(Type subtype) implements Type {
         @Override
         public String ir() {
             return "ptr";

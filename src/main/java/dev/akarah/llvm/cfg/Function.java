@@ -23,8 +23,10 @@ public class Function implements IRStringConvertable {
     public String ir() {
         return IRFormatter.format(
             """
-                define {} {}(params)code
+                keyword {} {}(params)code
                 """
+                .replace("keyword",
+                    this.basicBlocks == null ? "declare" : "define")
                 .replace(
                     "params",
                     this
@@ -35,13 +37,16 @@ public class Function implements IRStringConvertable {
                 .replace("code",
                     this.basicBlocks == null
                         ? ""
-                        : " {\n" + this.basicBlocks.stream().map(BasicBlock::ir).collect(Collectors.joining("\n"))) + "}",
+                        :
+                        (" {\n"
+                            + this.basicBlocks.stream().map(BasicBlock::ir).collect(Collectors.joining("\n")))
+                            + "\n}"),
 
             returnType, name
         );
     }
 
-    record Parameter(Value.LocalVariable value, Type type) {
+    record Parameter(Value value, Type type) {
         @Override
         public String toString() {
             return IRFormatter.format("{} {}", type, value);
@@ -59,7 +64,7 @@ public class Function implements IRStringConvertable {
     }
 
 
-    public Function parameter(Type type, Value.LocalVariable variable) {
+    public Function parameter(Type type, Value variable) {
         this.parameters.add(new Parameter(variable, type));
         return this;
     }

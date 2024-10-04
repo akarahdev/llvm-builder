@@ -1,12 +1,18 @@
 package dev.akarah.llvm.inst;
 
+import dev.akarah.llvm.cfg.GlobalVariable;
 import dev.akarah.llvm.ir.IRFormatter;
 import dev.akarah.llvm.ir.IRStringConvertable;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public interface Instruction extends IRStringConvertable {
     record Ret(Type type, Value value) implements Instruction {
         @Override
         public String ir() {
+            if(value == null)
+                return IRFormatter.format("ret {}", type);
             return IRFormatter.format("ret {} {}", type, value);
         }
     }
@@ -42,6 +48,21 @@ public interface Instruction extends IRStringConvertable {
         @Override
         public String ir() {
             return IRFormatter.format("{} = udiv {} {}, {}", output, type, lhs, rhs);
+        }
+    }
+
+    record Call(Value.LocalVariable output, Type outputType, Value.GlobalVariable name, List<Parameter> parameters) implements Instruction {
+        public record Parameter(Type type, Value value) {}
+
+        @Override
+        public String ir() {
+            return IRFormatter.format(
+                "{} = call {} {}(params)"
+                    .replace("params",
+                        parameters.stream()
+                            .map(it -> it.type().ir() + " " + it.value().ir())
+                            .collect(Collectors.joining(", "))),
+                output, outputType, name);
         }
     }
 }
