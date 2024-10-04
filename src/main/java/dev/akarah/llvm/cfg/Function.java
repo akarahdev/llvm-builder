@@ -69,12 +69,11 @@ public class Function implements IRStringConvertable {
         return this;
     }
 
-    public Function basicBlock(BasicBlock basicBlock) {
+    public Function withBasicBlock(BasicBlock basicBlock) {
         if (this.basicBlocks == null)
             this.basicBlocks = new ArrayList<>();
         this.basicBlocks.add(basicBlock);
+        basicBlock.addBasicBlocks(this);
         return this;
     }
-
-
 }

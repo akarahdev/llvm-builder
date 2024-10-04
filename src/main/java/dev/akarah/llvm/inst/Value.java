@@ -42,12 +42,19 @@ public sealed interface Value extends IRStringConvertable {
             return "%" + name;
         }
 
+        public static String toBase26(long number) {
+            StringBuilder result = new StringBuilder();
+            while (number > 0) {
+                result.insert(0, (char) ('a' + (--number % 26)));
+                number /= 26;
+            }
+            return result.toString();
+        }
+
         public static long counter = 0;
 
         public static LocalVariable random() {
-            return new LocalVariable(
-                String.valueOf(++counter)
-            );
+            return new LocalVariable(toBase26(++counter));
         }
     }
 
@@ -66,7 +73,7 @@ public sealed interface Value extends IRStringConvertable {
 
         public static GlobalVariable random() {
             return new GlobalVariable(
-                ".a" + UUID.randomUUID().toString().substring(0, 6)
+                "." + LocalVariable.toBase26(++LocalVariable.counter)
             );
         }
     }

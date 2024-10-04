@@ -10,14 +10,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class BasicBlock implements CodeBuilder, IRStringConvertable {
+public class BasicBlock implements IRStringConvertable {
     Value.LocalVariable name;
     List<Instruction> instructions = new ArrayList<>();
     Map<Value.LocalVariable, Integer> localNames = new HashMap<>();
+    List<BasicBlock> childBlocks = new ArrayList<>();
 
     private BasicBlock() {}
+
+    protected void addBasicBlocks(Function function) {
+        for(var child : childBlocks)
+            if(!function.basicBlocks.contains(child))
+                function.withBasicBlock(child);
+    }
+
+    public Value.LocalVariable name() {
+        return this.name;
+    }
+
+    public void childBlock(BasicBlock child) {
+        this.childBlocks.add(child);
+    }
 
     public static BasicBlock of(Value.LocalVariable name) {
         var bb = new BasicBlock();
@@ -25,42 +41,55 @@ public class BasicBlock implements CodeBuilder, IRStringConvertable {
         return bb;
     }
 
-    @Override
+    public BasicBlock ifThenElse(
+        Value condition,
+        Consumer<BasicBlock> ifTrue,
+        Consumer<BasicBlock> ifFalse
+    ) {
+        var ifTrueBlock = BasicBlock.of(Value.LocalVariable.random());
+        var ifFalseBlock = BasicBlock.of(Value.LocalVariable.random());
+
+        ifTrue.accept(ifTrueBlock);
+        ifFalse.accept(ifFalseBlock);
+
+        this.childBlock(ifTrueBlock);
+        this.childBlock(ifFalseBlock);
+
+        this.br(condition, ifTrueBlock.name(), ifFalseBlock.name());
+
+        return this;
+    }
+
     public Value add(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
         instructions.add(new Instruction.Add(output, type, lhs, rhs));
         return output;
     }
 
-    @Override
     public Value sub(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
         instructions.add(new Instruction.Sub(output, type, lhs, rhs));
         return output;
     }
 
-    @Override
     public Value mul(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
         instructions.add(new Instruction.Mul(output, type, lhs, rhs));
         return output;
     }
 
-    @Override
     public Value sdiv(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
         instructions.add(new Instruction.SDiv(output, type, lhs, rhs));
         return output;
     }
 
-    @Override
     public Value udiv(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
         instructions.add(new Instruction.UDiv(output, type, lhs, rhs));
         return output;
     }
 
-    @Override
     public Value call(Type returnType, Value.GlobalVariable name, List<Instruction.Call.Parameter> parameters) {
         var output = Value.LocalVariable.random();
         instructions.add(new Instruction.Call(
@@ -72,17 +101,54 @@ public class BasicBlock implements CodeBuilder, IRStringConvertable {
         return output;
     }
 
-    @Override
+    public Value alloca(Type type, int amount) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new Instruction.Alloca(
+            output,
+            type,
+            amount
+        ));
+        return output;
+    }
+
+    public Value alloca(Type type) {
+        return alloca(type, 1);
+    }
+
+    public Value load(Type type, Value pointer) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new Instruction.Load(
+            output,
+            type,
+            pointer
+        ));
+        return output;
+    }
+
+    public void store(Type type, Value value, Value pointer) {
+        instructions.add(new Instruction.Store(
+            type,
+            value,
+            pointer
+        ));
+    }
+
     public void ret(Type type, Value value) {
         instructions.add(new Instruction.Ret(type, value));
     }
 
-    @Override
     public void ret() {
         instructions.add(new Instruction.Ret(Types.VOID, null));
     }
 
-    @Override
+    public void br(Value.LocalVariable label) {
+        this.instructions.add(new Instruction.BrLabel(label));
+    }
+
+    public void br(Value condition, Value.LocalVariable ifTrue, Value.LocalVariable ifFalse) {
+        this.instructions.add(new Instruction.BrIf(condition, ifTrue, ifFalse));
+    }
+
     public String ir() {
         return "  " + this.name.name() + ":\n"
                 + this.instructions.stream().map(it -> "    " + it.ir()).collect(Collectors.joining("\n"));
