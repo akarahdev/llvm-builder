@@ -133,6 +133,31 @@ public class BasicBlock implements IRStringConvertable {
         ));
     }
 
+    public Value bitcast(Type inputType, Value inputValue, Type outputType) {
+        var out = Value.LocalVariable.random();
+        instructions.add(new Instruction.Bitcast(
+            out,
+            inputType,
+            inputValue,
+            outputType
+        ));
+        return out;
+    }
+
+    public Value getElementPtr(Type type, Value pointer, Type indexType, Value indexValue) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new Instruction.GetElementPtr(
+            output,
+            type,
+            pointer,
+            indexType,
+            indexValue
+        ));
+        return output;
+    }
+
+
+
     public void ret(Type type, Value value) {
         instructions.add(new Instruction.Ret(type, value));
     }

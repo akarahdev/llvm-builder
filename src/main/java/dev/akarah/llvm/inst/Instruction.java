@@ -134,6 +134,15 @@ public sealed interface Instruction extends IRStringConvertable {
         }
     }
 
+    record GetElementPtr(Value.LocalVariable output, Type type, Value pointer, Type indexType, Value indexValue) implements MemoryOperation {
+        @Override
+        public String ir() {
+            return IRFormatter.format(
+                "{} = getelementptr {}, ptr {}, {} {}",
+                output, type, pointer, indexType, indexValue);
+        }
+    }
+
     record Load(Value.LocalVariable output, Type type, Value pointer) implements MemoryOperation {
         @Override
         public String ir() {
@@ -149,6 +158,15 @@ public sealed interface Instruction extends IRStringConvertable {
             return IRFormatter.format(
                 "store {} {}, ptr {}",
                 type, value, pointer);
+        }
+    }
+
+    record Bitcast(Value.LocalVariable output, Type inputType, Value inputValue, Type outputType) implements MemoryOperation {
+        @Override
+        public String ir() {
+            return IRFormatter.format(
+                "{} = bitcast {} {} to {}",
+                output, inputType, inputValue, outputType);
         }
     }
 }
