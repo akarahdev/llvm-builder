@@ -3,7 +3,9 @@ package dev.akarah.llvm.inst;
 import dev.akarah.llvm.ir.IRFormatter;
 import dev.akarah.llvm.ir.IRStringConvertable;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public sealed interface Value extends IRStringConvertable {
     record IntegerConstant(String value) implements Value {
@@ -96,6 +98,34 @@ public sealed interface Value extends IRStringConvertable {
         @Override
         public String ir() {
             return IRFormatter.format("blockaddress({}, {})", function, block);
+        }
+    }
+
+    record VectorConstant(Type type, List<Value> parameters) implements Value {
+        @Override
+        public String ir() {
+            return "< " + parameters.stream().map(Value::ir).map(it -> type.ir() + " " + it).collect(Collectors.joining(", ")) + " >";
+        }
+    }
+
+    record ArrayConstant(Type type, List<Value> parameters) implements Value {
+        @Override
+        public String ir() {
+            return "[ " + parameters.stream().map(Value::ir).map(it -> type.ir() + " " + it).collect(Collectors.joining(", ")) + " ]";
+        }
+    }
+
+    record StructureConstant(List<Element> parameters) implements Value {
+        @Override
+        public String ir() {
+            return "{ " + parameters.stream().map(Element::toString).collect(Collectors.joining(", ")) + " }";
+        }
+
+        public record Element(Value value, Type type) {
+            @Override
+            public String toString() {
+                return this.type.ir() + " " + this.value.ir();
+            }
         }
     }
 
