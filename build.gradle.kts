@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("maven-publish")
 }
 
 group = "dev.akarah"
@@ -16,4 +17,33 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+
+            pom {
+                name = "llvm-builder"
+                description = "API for creating LLVM IR"
+                url = "https://akarah.dev"
+
+                scm {
+                    url = "https://github/akarahdev/llvm-builder"
+                }
+
+                issueManagement {
+                    system = "github"
+                    url = "https://github.com/akarahdev/llvm-builder/issues"
+                }
+                licenses {
+                    license {
+                        name.set("MIT")
+                        url.set("https://opensource.org/licenses/MIT")
+                    }
+                }
+            }
+        }
+    }
 }
