@@ -174,6 +174,10 @@ public class BasicBlock implements IRStringConvertable {
         this.instructions.add(new Instruction.BrIf(condition, ifTrue, ifFalse));
     }
 
+    public void comment(String contents) {
+        this.instructions.add(new Instruction.Comment(contents));
+    }
+
     public String ir() {
         return "  " + this.name.name() + ":\n"
                 + this.instructions.stream().map(it -> "    " + it.ir()).collect(Collectors.joining("\n"));

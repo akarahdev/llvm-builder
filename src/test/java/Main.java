@@ -18,6 +18,7 @@ public class Main {
         module.newFunction(new Value.GlobalVariable("main"), function -> {
             var bb = BasicBlock.of(Value.LocalVariable.random());
 
+            bb.comment("Comment time!");
             bb.ifThenElse(
                 Constant.constant(1),
                 ifTrue -> {

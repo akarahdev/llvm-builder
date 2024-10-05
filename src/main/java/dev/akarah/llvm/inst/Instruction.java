@@ -100,6 +100,13 @@ public sealed interface Instruction extends IRStringConvertable {
 
     sealed interface OtherOperation extends Instruction {}
 
+    record Comment(String contents) implements OtherOperation {
+        @Override
+        public String ir() {
+            return "; {}".replace("{}", contents);
+        }
+    }
+
     record Call(Value.LocalVariable output, Type outputType, Value.GlobalVariable name,
                 List<Parameter> parameters) implements OtherOperation {
         public record Parameter(Type type, Value value) {
@@ -169,4 +176,6 @@ public sealed interface Instruction extends IRStringConvertable {
                 output, inputType, inputValue, outputType);
         }
     }
+
+
 }
