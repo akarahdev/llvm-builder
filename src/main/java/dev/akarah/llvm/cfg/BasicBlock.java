@@ -1,7 +1,12 @@
 package dev.akarah.llvm.cfg;
 
-import dev.akarah.llvm.inst.*;
+import dev.akarah.llvm.inst.Instruction;
+import dev.akarah.llvm.inst.Type;
+import dev.akarah.llvm.inst.Types;
+import dev.akarah.llvm.inst.Value;
 import dev.akarah.llvm.inst.atomic.AtomicOrdering;
+import dev.akarah.llvm.inst.atomic.AtomicRMW;
+import dev.akarah.llvm.inst.atomic.RMWOperation;
 import dev.akarah.llvm.inst.memory.*;
 import dev.akarah.llvm.inst.misc.Call;
 import dev.akarah.llvm.inst.misc.Comment;
@@ -24,11 +29,12 @@ public class BasicBlock implements IRStringConvertable {
     Map<Value.LocalVariable, Integer> localNames = new HashMap<>();
     List<BasicBlock> childBlocks = new ArrayList<>();
 
-    private BasicBlock() {}
+    private BasicBlock() {
+    }
 
     protected void addBasicBlocks(Function function) {
-        for(var child : childBlocks)
-            if(!function.basicBlocks.contains(child))
+        for (var child : childBlocks)
+            if (!function.basicBlocks.contains(child))
                 function.withBasicBlock(child);
     }
 
@@ -65,6 +71,24 @@ public class BasicBlock implements IRStringConvertable {
         return this;
     }
 
+    public Value fadd(Type type, Value lhs, Value rhs) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new FAdd(output, type, lhs, rhs));
+        return output;
+    }
+
+    public Value fsub(Type type, Value lhs, Value rhs) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new FSub(output, type, lhs, rhs));
+        return output;
+    }
+
+    public Value fmul(Type type, Value lhs, Value rhs) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new FMul(output, type, lhs, rhs));
+        return output;
+    }
+
     public Value add(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
         instructions.add(new Add(output, type, lhs, rhs));
@@ -92,6 +116,36 @@ public class BasicBlock implements IRStringConvertable {
     public Value udiv(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
         instructions.add(new UDiv(output, type, lhs, rhs));
+        return output;
+    }
+
+    public Value shl(Type type, Value lhs, Value rhs) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new Shl(output, type, lhs, rhs));
+        return output;
+    }
+
+    public Value ashr(Type type, Value lhs, Value rhs) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new AShr(output, type, lhs, rhs));
+        return output;
+    }
+
+    public Value lshr(Type type, Value lhs, Value rhs) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new LShr(output, type, lhs, rhs));
+        return output;
+    }
+
+    public Value atomicrmw(
+        RMWOperation operation,
+        Type type,
+        Value pointer,
+        Value argument,
+        AtomicOrdering ordering
+    ) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new AtomicRMW(output, operation, type, pointer, argument, ordering));
         return output;
     }
 
@@ -276,6 +330,6 @@ public class BasicBlock implements IRStringConvertable {
 
     public String ir() {
         return "  " + this.name.name() + ":\n"
-                + this.instructions.stream().map(it -> "    " + it.ir()).collect(Collectors.joining("\n"));
+            + this.instructions.stream().map(it -> "    " + it.ir()).collect(Collectors.joining("\n"));
     }
 }
