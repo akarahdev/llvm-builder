@@ -149,6 +149,12 @@ public class BasicBlock implements IRStringConvertable {
         return output;
     }
 
+    public Value icmp(ComparisonOperation operation, Type type, Value lhs, Value rhs) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new ICmp(output, operation, type, lhs, rhs));
+        return output;
+    }
+
     public Value call(Type returnType, Value.GlobalVariable name, List<Call.Parameter> parameters) {
         var output = Value.LocalVariable.random();
         instructions.add(new Call(
