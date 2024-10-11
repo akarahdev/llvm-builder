@@ -249,8 +249,9 @@ public class BasicBlock implements IRStringConvertable {
         return output;
     }
 
-
-
+    public void perform(Instruction instruction) {
+        this.instructions.add(instruction);
+    }
 
 
     public void ret(Type type, Value value) {
