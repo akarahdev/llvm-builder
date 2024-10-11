@@ -149,6 +149,25 @@ public sealed interface Instruction extends IRStringConvertable {
                 output, type, pointer, indexType, indexValue);
         }
     }
+    record GetElementPtr2(Value.LocalVariable output, Type type, Value pointer,
+                          Type indexType1, Value indexValue1, Type indexType2, Value indexValue2) implements MemoryOperation {
+        @Override
+        public String ir() {
+            return IRFormatter.format(
+                "{} = getelementptr {}, ptr {}, {} {}, {} {}",
+                output, type, pointer, indexType1, indexValue1, indexType2, indexValue2);
+        }
+    }
+    record GetElementPtr3(Value.LocalVariable output, Type type, Value pointer,
+                          Type indexType1, Value indexValue1, Type indexType2, Value indexValue2,
+                          Type indexType3, Value indexValue3) implements MemoryOperation {
+        @Override
+        public String ir() {
+            return IRFormatter.format(
+                "{} = getelementptr {}, ptr {}, {} {}, {} {}, {} {}",
+                output, type, pointer, indexType1, indexValue1, indexType2, indexValue2, indexType3, indexValue3);
+        }
+    }
 
     record ExtractValue(Value.LocalVariable output, Type type, Value pointer, Value indexConstant) implements MemoryOperation {
         @Override
