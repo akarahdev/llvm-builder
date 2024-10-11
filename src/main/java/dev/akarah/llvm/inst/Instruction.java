@@ -178,6 +178,24 @@ public sealed interface Instruction extends IRStringConvertable {
         }
     }
 
+    record PtrToInt(Value.LocalVariable output, Type type, Value pointer, Type outputType) implements MemoryOperation {
+        @Override
+        public String ir() {
+            return IRFormatter.format(
+                "{} = ptrtoint {} {} to {}",
+                output, type, pointer, outputType);
+        }
+    }
+
+    record IntToPtr(Value.LocalVariable output, Type type, Value pointer, Type outputType) implements MemoryOperation {
+        @Override
+        public String ir() {
+            return IRFormatter.format(
+                "{} = inttoptr {} {} to {}",
+                output, type, pointer, outputType);
+        }
+    }
+
     record Load(Value.LocalVariable output, Type type, Value pointer) implements MemoryOperation {
         @Override
         public String ir() {

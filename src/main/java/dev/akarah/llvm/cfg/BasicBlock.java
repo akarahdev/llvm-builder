@@ -202,6 +202,30 @@ public class BasicBlock implements IRStringConvertable {
         return output;
     }
 
+    public Value ptrToInt(Type type, Value value, Type outputType) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new Instruction.PtrToInt(
+            output,
+            type,
+            value,
+            outputType
+        ));
+        return output;
+    }
+
+    public Value intToPtr(Type type, Value value, Type outputType) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new Instruction.IntToPtr(
+            output,
+            type,
+            value,
+            outputType
+        ));
+        return output;
+    }
+
+
+
 
 
     public void ret(Type type, Value value) {
