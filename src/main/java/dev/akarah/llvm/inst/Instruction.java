@@ -150,6 +150,15 @@ public sealed interface Instruction extends IRStringConvertable {
         }
     }
 
+    record ExtractValue(Value.LocalVariable output, Type type, Value pointer, Value indexConstant) implements MemoryOperation {
+        @Override
+        public String ir() {
+            return IRFormatter.format(
+                "{} = extractvalue {} {}, {}",
+                output, type, pointer, indexConstant);
+        }
+    }
+
     record Load(Value.LocalVariable output, Type type, Value pointer) implements MemoryOperation {
         @Override
         public String ir() {

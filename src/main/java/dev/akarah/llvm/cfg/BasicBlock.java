@@ -156,6 +156,17 @@ public class BasicBlock implements IRStringConvertable {
         return output;
     }
 
+    public Value extractValue(Type type, Value value, Value index) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new Instruction.ExtractValue(
+            output,
+            type,
+            value,
+            index
+        ));
+        return output;
+    }
+
 
 
     public void ret(Type type, Value value) {
