@@ -94,6 +94,13 @@ public sealed interface Value extends IRStringConvertable {
         }
     }
 
+    record NullPtr() implements Value {
+        @Override
+        public String ir() {
+            return "null";
+        }
+    }
+
     record BlockAddress(GlobalVariable function, LocalVariable block) implements Value {
         @Override
         public String ir() {

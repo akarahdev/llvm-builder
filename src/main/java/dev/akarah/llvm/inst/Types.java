@@ -3,8 +3,12 @@ package dev.akarah.llvm.inst;
 public final class Types {
     public static Type VOID = new Type.Void();
 
+    public static Type pointer() {
+        return new Type.Ptr();
+    }
+
     public static Type pointerTo(Type subtype) {
-        return new Type.Ptr(subtype);
+        return new Type.Ptr();
     }
 
     public static Type integer(int width) {
