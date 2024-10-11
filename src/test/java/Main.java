@@ -1,6 +1,7 @@
 import dev.akarah.llvm.Module;
 import dev.akarah.llvm.cfg.BasicBlock;
 import dev.akarah.llvm.inst.*;
+import dev.akarah.llvm.inst.misc.Call;
 import dev.akarah.llvm.utils.LibcLibrary;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class Main {
                 Constant.constant(1),
                 ifTrue -> {
                     ifTrue.call(Types.integer(32), new Value.GlobalVariable("puts"), List.of(
-                        new Instruction.Call.Parameter(
+                        new Call.Parameter(
                             Types.pointerTo(Types.array(13, Types.integer(8))),
                             gv
                         )

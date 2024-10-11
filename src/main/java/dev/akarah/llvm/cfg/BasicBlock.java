@@ -1,10 +1,15 @@
 package dev.akarah.llvm.cfg;
 
-import dev.akarah.llvm.inst.Types;
+import dev.akarah.llvm.inst.*;
+import dev.akarah.llvm.inst.atomic.AtomicOrdering;
+import dev.akarah.llvm.inst.memory.*;
+import dev.akarah.llvm.inst.misc.Call;
+import dev.akarah.llvm.inst.misc.Comment;
+import dev.akarah.llvm.inst.ops.*;
+import dev.akarah.llvm.inst.terminator.BrIf;
+import dev.akarah.llvm.inst.terminator.BrLabel;
+import dev.akarah.llvm.inst.terminator.Ret;
 import dev.akarah.llvm.ir.IRStringConvertable;
-import dev.akarah.llvm.inst.Instruction;
-import dev.akarah.llvm.inst.Type;
-import dev.akarah.llvm.inst.Value;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,37 +67,37 @@ public class BasicBlock implements IRStringConvertable {
 
     public Value add(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.Add(output, type, lhs, rhs));
+        instructions.add(new Add(output, type, lhs, rhs));
         return output;
     }
 
     public Value sub(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.Sub(output, type, lhs, rhs));
+        instructions.add(new Sub(output, type, lhs, rhs));
         return output;
     }
 
     public Value mul(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.Mul(output, type, lhs, rhs));
+        instructions.add(new Mul(output, type, lhs, rhs));
         return output;
     }
 
     public Value sdiv(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.SDiv(output, type, lhs, rhs));
+        instructions.add(new SDiv(output, type, lhs, rhs));
         return output;
     }
 
     public Value udiv(Type type, Value lhs, Value rhs) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.UDiv(output, type, lhs, rhs));
+        instructions.add(new UDiv(output, type, lhs, rhs));
         return output;
     }
 
-    public Value call(Type returnType, Value.GlobalVariable name, List<Instruction.Call.Parameter> parameters) {
+    public Value call(Type returnType, Value.GlobalVariable name, List<Call.Parameter> parameters) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.Call(
+        instructions.add(new Call(
             output,
             returnType,
             name,
@@ -103,7 +108,7 @@ public class BasicBlock implements IRStringConvertable {
 
     public Value alloca(Type type, int amount) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.Alloca(
+        instructions.add(new Alloca(
             output,
             type,
             amount
@@ -117,7 +122,7 @@ public class BasicBlock implements IRStringConvertable {
 
     public Value load(Type type, Value pointer) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.Load(
+        instructions.add(new Load(
             output,
             type,
             pointer
@@ -125,17 +130,37 @@ public class BasicBlock implements IRStringConvertable {
         return output;
     }
 
+    public Value loadAtomic(Type type, Value pointer, AtomicOrdering ordering) {
+        var output = Value.LocalVariable.random();
+        instructions.add(new LoadAtomic(
+            output,
+            type,
+            pointer,
+            ordering
+        ));
+        return output;
+    }
+
     public void store(Type type, Value value, Value pointer) {
-        instructions.add(new Instruction.Store(
+        instructions.add(new Store(
             type,
             value,
             pointer
         ));
     }
 
+    public void storeAtomic(Type type, Value value, Value pointer, AtomicOrdering ordering) {
+        instructions.add(new StoreAtomic(
+            type,
+            value,
+            pointer,
+            ordering
+        ));
+    }
+
     public Value bitcast(Type inputType, Value inputValue, Type outputType) {
         var out = Value.LocalVariable.random();
-        instructions.add(new Instruction.Bitcast(
+        instructions.add(new Bitcast(
             out,
             inputType,
             inputValue,
@@ -146,7 +171,7 @@ public class BasicBlock implements IRStringConvertable {
 
     public Value getElementPtr(Type type, Value pointer, Type indexType, Value indexValue) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.GetElementPtr(
+        instructions.add(new GetElementPtr(
             output,
             type,
             pointer,
@@ -160,7 +185,7 @@ public class BasicBlock implements IRStringConvertable {
                                Type indexType1, Value indexValue1,
                                Type indexType2, Value indexValue2) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.GetElementPtr2(
+        instructions.add(new GetElementPtr2(
             output,
             type,
             pointer,
@@ -177,7 +202,7 @@ public class BasicBlock implements IRStringConvertable {
                                Type indexType2, Value indexValue2,
                                Type indexType3, Value indexValue3) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.GetElementPtr3(
+        instructions.add(new GetElementPtr3(
             output,
             type,
             pointer,
@@ -193,7 +218,7 @@ public class BasicBlock implements IRStringConvertable {
 
     public Value extractValue(Type type, Value value, Value index) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.ExtractValue(
+        instructions.add(new ExtractValue(
             output,
             type,
             value,
@@ -204,7 +229,7 @@ public class BasicBlock implements IRStringConvertable {
 
     public Value ptrToInt(Type type, Value value, Type outputType) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.PtrToInt(
+        instructions.add(new PtrToInt(
             output,
             type,
             value,
@@ -215,7 +240,7 @@ public class BasicBlock implements IRStringConvertable {
 
     public Value intToPtr(Type type, Value value, Type outputType) {
         var output = Value.LocalVariable.random();
-        instructions.add(new Instruction.IntToPtr(
+        instructions.add(new IntToPtr(
             output,
             type,
             value,
@@ -229,23 +254,23 @@ public class BasicBlock implements IRStringConvertable {
 
 
     public void ret(Type type, Value value) {
-        instructions.add(new Instruction.Ret(type, value));
+        instructions.add(new Ret(type, value));
     }
 
     public void ret() {
-        instructions.add(new Instruction.Ret(Types.VOID, null));
+        instructions.add(new Ret(Types.VOID, null));
     }
 
     public void br(Value.LocalVariable label) {
-        this.instructions.add(new Instruction.BrLabel(label));
+        this.instructions.add(new BrLabel(label));
     }
 
     public void br(Value condition, Value.LocalVariable ifTrue, Value.LocalVariable ifFalse) {
-        this.instructions.add(new Instruction.BrIf(condition, ifTrue, ifFalse));
+        this.instructions.add(new BrIf(condition, ifTrue, ifFalse));
     }
 
     public void comment(String contents) {
-        this.instructions.add(new Instruction.Comment(contents));
+        this.instructions.add(new Comment(contents));
     }
 
     public String ir() {
