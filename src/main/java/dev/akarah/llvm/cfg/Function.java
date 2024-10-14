@@ -23,7 +23,7 @@ public class Function implements IRStringConvertable {
     public String ir() {
         return IRFormatter.format(
             """
-                keyword {} {}(params)code
+                keyword {} {}(paramsvarargs)code
                 """
                 .replace("keyword",
                     this.basicBlocks == null ? "declare" : "define")
@@ -34,6 +34,10 @@ public class Function implements IRStringConvertable {
                         .stream()
                         .map(Parameter::toString)
                         .collect(Collectors.joining(", ")))
+                .replace(
+                    "varargs",
+                    this.varArgs ? ", ..." : ""
+                )
                 .replace("code",
                     this.basicBlocks == null
                         ? ""
@@ -57,6 +61,7 @@ public class Function implements IRStringConvertable {
     Type returnType = new Type.Void();
     List<Parameter> parameters = new ArrayList<>();
     List<BasicBlock> basicBlocks = null;
+    boolean varArgs = false;
 
     public Function returns(Type returnType) {
         this.returnType = returnType;
@@ -74,6 +79,11 @@ public class Function implements IRStringConvertable {
             this.basicBlocks = new ArrayList<>();
         this.basicBlocks.add(basicBlock);
         basicBlock.addBasicBlocks(this);
+        return this;
+    }
+
+    public Function withVarargs() {
+        this.varArgs = true;
         return this;
     }
 }
